@@ -9,11 +9,16 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/zhiminwen/quote"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func main() {
 	namespace := os.Getenv("K8S_NAMESPACE")
+	mode := os.Getenv("MODE")
+
 	clientSet, _, err := k8sDiscovery.K8s()
 	if err != nil {
 		logrus.Fatalf("Failed to connect to K8s:%v", err)
@@ -22,6 +27,42 @@ func main() {
 	pods, err := clientSet.CoreV1().Pods(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		logrus.Fatalf("Failed to connect to pods:%v", err)
+	}
+
+	switch mode {
+	case "checkmk":
+		var nsReqCPU int64 = 0
+		var nsLimCPU int64 = 0
+		var nsReqMem int64 = 0
+		var nsLimMem int64 = 0
+		var nsReqFS int64 = 0
+		var nsLimFS int64 = 0
+		for _, p := range pods.Items {
+			for _, c := range p.Spec.Containers {
+				nsReqCPU += c.Resources.Requests.Cpu().MilliValue()
+				nsLimCPU += c.Resources.Limits.Cpu().MilliValue()
+				nsReqMem += c.Resources.Requests.Memory().Value()
+				nsLimMem += c.Resources.Limits.Memory().Value()
+				nsReqFS += c.Resources.Requests.StorageEphemeral().Value()
+				nsLimFS += c.Resources.Limits.StorageEphemeral().Value()
+			}
+		}
+		if nsLimCPU == 0 {
+			fmt.Printf("CPU load: %v\n", resource.NewMilliQuantity(nsReqCPU, "DecimalSI"))
+		} else {
+			fmt.Printf("CPU load: %v%%\n", nsReqCPU/nsLimCPU)
+		}
+		if nsLimMem == 0 {
+			fmt.Printf("Memory load: %v\n", resource.NewQuantity(nsReqMem, "BinarySI"))
+		} else {
+			fmt.Printf("Memory load: %v%%\n", nsReqMem/nsLimMem)
+		}
+		if nsLimFS == 0 {
+			fmt.Printf("FS load: %v\n", resource.NewQuantity(nsReqFS, "BinarySI"))
+		} else {
+			fmt.Printf("FS load: %v%%\n", nsReqFS/nsLimFS)
+		}
+		return
 	}
 
 	f := excelize.NewFile()

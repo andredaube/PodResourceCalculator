@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -20,7 +19,7 @@ func main() {
 		logrus.Fatalf("Failed to connect to K8s:%v", err)
 	}
 
-	pods, err := clientSet.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{})
+	pods, err := clientSet.CoreV1().Pods(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		logrus.Fatalf("Failed to connect to pods:%v", err)
 	}
@@ -41,9 +40,9 @@ func main() {
 	row := 3
 	for _, p := range pods.Items {
 		for _, c := range p.Spec.Containers {
-			reqCpu := c.Resources.Requests.Cpu()
+			reqCPU := c.Resources.Requests.Cpu()
 			reqMem := c.Resources.Requests.Memory()
-			limCpu := c.Resources.Limits.Cpu()
+			limCPU := c.Resources.Limits.Cpu()
 			limMem := c.Resources.Limits.Memory()
 
 			cellName, err := excelize.CoordinatesToCellName(1, row)
@@ -56,9 +55,9 @@ func main() {
 					p.Name,
 					p.Status.HostIP,
 					c.Name,
-					reqCpu.MilliValue(), reqCpu,
+					reqCPU.MilliValue(), reqCPU,
 					reqMem.Value(), reqMem,
-					limCpu.MilliValue(), limCpu,
+					limCPU.MilliValue(), limCPU,
 					limMem.Value(), limMem,
 				})
 			if err != nil {

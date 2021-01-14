@@ -1,4 +1,4 @@
 *.xlsx
 *.bin
 .idea
-k8srd
+build

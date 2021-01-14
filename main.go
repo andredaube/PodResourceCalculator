@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"pkg/k8sDiscovery"
 
@@ -50,17 +51,17 @@ func main() {
 		if nsLimCPU == 0 {
 			fmt.Printf("CPU load: %v\n", resource.NewMilliQuantity(nsReqCPU, "DecimalSI"))
 		} else {
-			fmt.Printf("CPU load: %v%%\n", nsReqCPU/nsLimCPU)
+			fmt.Printf("CPU load: %v%%\n", math.Ceil(float64(nsReqCPU)/float64(nsLimCPU)*10000)/100)
 		}
 		if nsLimMem == 0 {
 			fmt.Printf("Memory load: %v\n", resource.NewQuantity(nsReqMem, "BinarySI"))
 		} else {
-			fmt.Printf("Memory load: %v%%\n", nsReqMem/nsLimMem)
+			fmt.Printf("Memory load: %v%%\n", math.Ceil(float64(nsReqMem)/float64(nsLimMem)*10000)/100)
 		}
 		if nsLimFS == 0 {
 			fmt.Printf("FS load: %v\n", resource.NewQuantity(nsReqFS, "BinarySI"))
 		} else {
-			fmt.Printf("FS load: %v%%\n", nsReqFS/nsLimFS)
+			fmt.Printf("FS load: %v%%\n", math.Ceil(float64(nsReqFS)/float64(nsLimFS)*10000)/100)
 		}
 		return
 	}

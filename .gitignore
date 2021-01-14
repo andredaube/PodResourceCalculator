@@ -1,3 +1,4 @@
 *.xlsx
 *.bin
+.idea
 k8srd

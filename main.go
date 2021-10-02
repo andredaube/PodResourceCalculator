@@ -89,7 +89,7 @@ func main() {
 			"active_cell": "A3",
 			"pane": "bottomLeft"
 		}]
-		}`)
+	}`)
 
 	if err = f.SaveAs("resource.xlsx"); err != nil {
 		logrus.Fatalf("Failed to save as xlsx:%v", err)

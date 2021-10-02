@@ -75,6 +75,22 @@ func main() {
 	f.SetCellFormula("Sheet1", "I1", fmt.Sprintf(`subtotal(109, I3:I%d)/1000`, row))
 	f.SetCellFormula("Sheet1", "K1", fmt.Sprintf(`subtotal(109, K3:K%d)/1024/1024/1024`, row))
 
+	// freeze first two rows
+	f.SetPanes("Sheet1", `{
+		"freeze": true,
+		"split": false,
+		"x_split": 0,
+		"y_split": 2,
+		"top_left_cell": "A3",
+		"active_pane": "bottomLeft",
+		"panes": [
+		{
+			"sqref": "A3:A3",
+			"active_cell": "A3",
+			"pane": "bottomLeft"
+		}]
+		}`)
+
 	if err = f.SaveAs("resource.xlsx"); err != nil {
 		logrus.Fatalf("Failed to save as xlsx:%v", err)
 	}

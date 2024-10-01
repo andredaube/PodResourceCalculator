@@ -7,7 +7,7 @@ import (
 	"os"
 	"pkg/k8sDiscovery"
 
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
+	"github.com/qax-os/excelize/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/zhiminwen/quote"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -45,6 +45,8 @@ func main() {
 			reqMem := c.Resources.Requests.Memory()
 			limCpu := c.Resources.Limits.Cpu()
 			limMem := c.Resources.Limits.Memory()
+
+			//statCpu := ( (( limCpu.MilliValue() / limCpu.MilliValue() )-1) * limCpu.MilliValue() + limCpu.MilliValue() ) * limCpu.MilliValue() / limCpu.MilliValue()
 
 			cellName, err := excelize.CoordinatesToCellName(1, row)
 			if err != nil {

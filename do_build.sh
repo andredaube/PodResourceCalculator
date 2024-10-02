@@ -5,9 +5,21 @@
 IMAGE_NAME=podresourcecalculator
 TAG=1
 
-docker build . -t ${IMAGE_NAME}:${TAG}
+UID=$(id -u)
+GID=$(id -g)
+IDUN=$(id -un)
 
-docker run --rm -v ./out:/out --name ${IMAGE_NAME} ${IMAGE_NAME}:${TAG} cp /PodResourceCalculator /out
+docker build . -t ${IMAGE_NAME}:${TAG} \
+  --build-arg UID=${UID} \
+  --build-arg GID=${GID} \
+  --build-arg IDUN=${IDUN}
 
-docker rmi ${IMAGE_NAME}:${TAG}
+docker run --rm -v ./:/out \
+  --name ${IMAGE_NAME} \
+  ${IMAGE_NAME}:${TAG} \
+  cp /src/PodResourceCalculator /out
+
+if [ $? -eq 0 ]; then
+  type strip > /dev/null 2>&1 && strip ./PodResourceCalculator
+fi
 
